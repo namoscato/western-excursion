@@ -6,6 +6,7 @@ import React from 'react';
 import config from './config';
 
 const propTypes = {
+    tag: React.PropTypes.string,
     width: React.PropTypes.number.isRequired,
 };
 
@@ -29,13 +30,17 @@ export default class FlickrPhotoList extends React.Component {
             draggedPointKey: null,
             photos: [],
         };
+    }
 
-        this.fetchPhotos('west-01-vegas');
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.tag && this.props.tag !== nextProps.tag) {
+            this.fetchPhotos(nextProps.tag);
+        }
     }
 
     fetchPhotos(tag) {
         return fetch(`https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${config.FLICKR_API_KEY}&user_id=${config.FLICKR_USER_ID}&tags=${tag}&sort=date-taken-asc&format=json&nojsoncallback=1&extras=url_m`)
-            .then((response) => response.json())
+            .then(response => response.json())
             .then((response) => {
                 if (response.stat !== 'ok') {
                     throw response;
@@ -79,7 +84,7 @@ export default class FlickrPhotoList extends React.Component {
         return (
             <ul style={styles.ul}>
                 {
-                    this.state.photos.map((photo) =>
+                    this.state.photos.map(photo =>
                         <li
                             key={photo.get('id')}
                             style={styles.li}
@@ -93,7 +98,7 @@ export default class FlickrPhotoList extends React.Component {
                                     position: 'absolute',
                                 }}
                             />
-                        </li>
+                        </li>,
                     )
                 }
             </ul>

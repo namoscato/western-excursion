@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import MapGL from 'react-map-gl';
 import React from 'react';
 
-import ClickablePointsOverlay from './clickable-points-overlay.jsx';
+import ClickablePointsOverlay from './clickable-points-overlay';
 import config from './config';
 import data from './data/points.json';
 
@@ -30,14 +30,16 @@ export default class Map extends React.Component {
             points.push({
                 id: i,
                 location: feature.geometry.coordinates,
-                name: feature.properties.name,
+                properties: feature.properties,
             });
         });
 
         this.state = {
             viewport: {
-                longitude: -108.7061596,
+                isDragging: null,
                 latitude: 40.7716204,
+                longitude: -108.7061596,
+                startDragLngLat: null,
                 zoom: 4.7,
             },
             points: Immutable.fromJS(points),
@@ -47,13 +49,15 @@ export default class Map extends React.Component {
     render() {
         const viewport = {
             ...this.state.viewport,
-            ...this.props,
+            height: this.props.height,
+            width: this.props.width,
         };
 
         return (
             <MapGL
                 {...viewport}
                 mapboxApiAccessToken={this.mapboxApiAccessToken}
+                onChangeViewport={viewportValue => this.setState({ viewport: viewportValue })}
             >
                 <ClickablePointsOverlay
                     {...viewport}
@@ -61,7 +65,7 @@ export default class Map extends React.Component {
                     points={this.state.points}
                     onClickPoint={this.props.onClickPoint}
                     renderPoint={
-                        (point) => (
+                        point => (
                             <g>
                                 <circle
                                     style={{ fill: alphaify('#000', 0.5), pointerEvents: 'all' }}

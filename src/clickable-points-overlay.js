@@ -8,14 +8,11 @@ function noop() {}
 
 const propTypes = {
     height: PropTypes.number.isRequired,
-    latitude: PropTypes.number.isRequired,
     lngLatAccessor: PropTypes.func.isRequired,
-    longitude: PropTypes.number.isRequired,
     onClickPoint: PropTypes.func.isRequired,
     points: PropTypes.instanceOf(Immutable.List).isRequired,
     renderPoint: PropTypes.func.isRequired,
     width: PropTypes.number.isRequired,
-    zoom: PropTypes.number.isRequired,
 };
 
 const defaultProps = {

@@ -4,8 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import window from 'global/window';
 
-import FlickrPhotoList from './flickr-photo-list.jsx';
-import Map from './map.jsx';
+import FlickrPhotoList from './flickr-photo-list';
+import Map from './map';
 
 const styles = {
     content: {
@@ -14,11 +14,18 @@ const styles = {
         position: 'absolute',
         right: 0,
     },
+    description: {
+        lineHeight: 1.5,
+    },
+    header: {
+        padding: 20,
+    },
     h1: {
         fontFamily: "'Playfair Display', serif",
         fontSize: '1.5em',
         fontWeight: 'bold',
-        margin: 20,
+        marginBottom: 20,
+        marginTop: 0,
     },
     map: {
         position: 'fixed',
@@ -31,7 +38,7 @@ export default class App extends React.Component {
         super(props);
 
         this.state = {
-            activeLocationName: null,
+            activeLocation: null,
             windowHeight: window.innerHeight,
             windowWidth: window.innerWidth,
         };
@@ -42,15 +49,25 @@ export default class App extends React.Component {
     @autobind
     onClickPoint(point) {
         this.setState({
-            activeLocationName: point.get('name'),
+            activeLocation: point.get('properties'),
         });
     }
 
-    @autobind onWindowResize() {
+    @autobind
+    onWindowResize() {
         this.setState({
             windowHeight: window.innerHeight,
             windowWidth: window.innerWidth,
         });
+    }
+
+    @autobind
+    getActiveLocationProperty(property) {
+        if (this.state.activeLocation === null) {
+            return null;
+        }
+
+        return this.state.activeLocation.get(property);
     }
 
     render() {
@@ -69,10 +86,16 @@ export default class App extends React.Component {
                         width: this.state.windowWidth / 2,
                     }}
                 >
-                    <h1 style={styles.h1}>
-                        { this.state.activeLocationName }
-                    </h1>
+                    <div style={styles.header}>
+                        <h1 style={styles.h1}>
+                            { this.getActiveLocationProperty('name') }
+                        </h1>
+                        <div style={styles.description}>
+                            { this.getActiveLocationProperty('description') }
+                        </div>
+                    </div>
                     <FlickrPhotoList
+                        tag={this.getActiveLocationProperty('flickrTag')}
                         width={this.state.windowWidth / 2}
                     />
                 </div>
